@@ -1,11 +1,19 @@
 <script setup>
 const { makes } = useCars();
+const { city: cityList } = useCars();
 const modal = ref({
   make: false,
   location: false,
   price: false,
 });
-const city = ref("");
+const resetModal = () => {
+  modal.value = {
+    make: false,
+    location: false,
+    price: false,
+  };
+}
+const selectedCity = ref("");
 const priceRange = ref({
   min: "",
   max: "",
@@ -28,20 +36,22 @@ const priceRangeText = computed(() => {
 });
 
 const updateModal = (key) => {
-  modal.value[key] = !modal.value[key];
+  let val = modal.value[key];
+  resetModal();
+  modal.value[key] = !val;
 };
 
 const onChangeLocation = () => {
-  if (!city.value) return;
-  if (!isNaN(parseInt(city.value))) {
+  if (!selectedCity.value) return;
+  if (!isNaN(parseInt(selectedCity.value))) {
     throw createError({
       statusCode: 400,
       message: "Invalid city format",
     });
   }
   updateModal("location");
-  navigateTo(`/city/${city.value}/car/${route.params.make}`);
-  city.value = "";
+  navigateTo(`/city/${selectedCity.value}/car/${route.params.make}`);
+  selectedCity.value = "";
 };
 
 const onChangeMake = (make) => {
@@ -64,7 +74,7 @@ const onChangePrice = () => {console.log(priceRange.value.max);
 </script>
 
 <template>
-  <div class="shadow border w-64 mr-10 z-30 h-[190px]">
+  <div class="shadow border w-56 mr-10 z-30 h-[190px]">
     <!-- LOCATION START -->
     <div class="p-5 flex justify-between relative cursor-pointer border-b">
       <h3>Location</h3>
@@ -75,7 +85,9 @@ const onChangePrice = () => {console.log(priceRange.value.max);
         v-if="modal.location"
         class="absolute border shadow left-56 p-5 top-1 -m-1 bg-white"
       >
-        <input type="text" class="border p-1 rounded" v-model="city" />
+        <select type="text" class="border p-1 rounded w-[200px]" v-model="selectedCity">
+          <option :value="cityName" v-for="cityName in cityList" :key="cityName">{{ cityName }}</option>
+        </select>
         <button
           @click="onChangeLocation"
           class="bg-blue-400 w-full mt-2 rounded text-white p-1"

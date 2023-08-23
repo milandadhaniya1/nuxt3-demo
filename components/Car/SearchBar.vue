@@ -1,12 +1,13 @@
 <script setup>
-const city = ref("");
+const selectedCity = ref("");
+const { city: cityList } = useCars();
 const cityError = ref(false);
 
 const handleSearch = () => {
-  if (!city.value) {
+  if (!selectedCity.value) {
     return (cityError.value = true);
   }
-  navigateTo(`/city/${city.value}/car`);
+  navigateTo(`/city/${selectedCity.value}/car`);
 };
 </script>
 
@@ -25,13 +26,15 @@ const handleSearch = () => {
       mx-auto
     "
   >
-    <input
+    <select
       type="text"
       class="py-3 px-5 w-full text-2xl rounded-full focus:outline-none"
       :class="cityError ? 'border-red-500 border' : ''"
       placeholder="Search by city..."
-      v-model="city"
-    />
+      v-model="selectedCity"
+    >
+      <option :value="city" v-for="city in cityList" :key="city">{{ city }}</option>      
+    </select>
     <button class="bg-sky-500 px-10 text-white" @click="handleSearch">
       Search
     </button>
